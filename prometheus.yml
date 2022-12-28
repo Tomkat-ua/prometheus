@@ -1,0 +1,179 @@
+# my global config
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+#  - job_name: 'prometheus'
+
+#    metrics_path: '/metrics'
+#    # scheme defaults to 'http'.
+
+#    static_configs:
+#    - targets: ['192.168.1.7:9090']
+#      labels:
+#        location: 'kremenchuk'
+#        instance: 'prometheus'
+
+###### JOBS   ############################
+# 1 ----------------------------------
+  - job_name: 'sys-services'
+    static_configs:
+
+    - targets: ['192.168.1.7:3000']
+      labels:
+        location: 'kremenchuk'
+        role: 'grafana'
+        media: virtual
+    - targets: ['192.168.1.7:9090']
+      labels:
+        location: 'kremenchuk'
+        role: 'prometheus'
+        media: virtual
+    - targets: ['192.168.1.7:9323']
+      labels:
+        location: 'kremenchuk'
+        role: 'docker'
+        media: virtual
+# 2 --------------------------------
+  - job_name: 'servers'
+    scrape_interval: 5s
+    static_configs:
+
+    - targets: ['192.168.2.7:9100']
+      labels:
+        location: 'kyiv'
+        role: 'ha-server'
+        media: hard
+
+    - targets: ['192.168.1.105:9100']
+      labels:
+        location: kremenchuk
+        role: attack
+        media: virtual
+
+    - targets: ['176.105.205.91:9100']
+      labels:
+        location: 'pischane'
+        role: 'ha-server'
+        media: hard
+
+    - targets: ['192.168.1.7:9100']
+      labels:
+        location: 'kremenchuk'
+        role: 'file-server'
+        media: hard
+
+    - targets: ['192.168.1.155:9100']
+      labels:
+        location: 'kremenchuk'
+        role: 'ha-server'
+        media: virtual
+
+# 3 ----------------------------------
+  - job_name: 'hass-kyiv'
+    scrape_interval: 5s
+    metrics_path: /api/prometheus
+    params:
+      api_password: ['Dooa_454ff']
+    bearer_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI1N2JjMTM4N2Q1NGE0ZGE2OGI4OGM1ODA5ZDQ0OGExNSIsImlhdCI6MTYyMTQ1Mjg1MiwiZXhwIjoxOTM2ODEyODUyfQ.6GqCC98DJ39Vh69v8w-1RmpDy0uyGNnMJM4WC12Moic"
+    scheme: http
+    static_configs:
+
+    - targets: ['192.168.2.7:8123']
+      labels:
+        location: 'kyiv'
+        role: 'hassio'
+        media: virtual
+
+# 4 ----------------------------------
+  - job_name: 'hass-pischane'
+    scrape_interval: 5s
+    metrics_path: /api/prometheus
+    params:
+      api_password: ['Sehbp_380rd']
+    bearer_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJmYzJiODAyMTMzOGI0MmQ1OTQ3ZDg5MTRiYmI3ZDM1OCIsImlhdCI6MTYyMzQ0ODEzMSwiZXhwIjoxOTM4ODA4MTMxfQ.rosDRDdGD9-rgv_oPoLUuu3uEon4diS1FDMhIwyzDMA"
+    scheme: http
+    static_configs:
+
+    - targets: ['176.105.205.91:8040']
+      labels:
+        location: 'pischane'
+        role: 'hassio'
+        media: virtual
+
+# 5 ------------------------------------
+  - job_name: 'hass-kremen'
+    scrape_interval: 5s
+    metrics_path: /api/prometheus
+    params:
+      api_password: ['Gtrre_87834ac']
+    bearer_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJiMDAwM2E0M2JmNzA0ZmNkOGExZmQ2NDBlYTk0MjEwNSIsImlhdCI6MTY2ODc2NjY3NCwiZXhwIjoxOTg0MTI2Njc0fQ.StB4OQOCYeOm75_WZFv3P3QsOJO6wydB655QfY_tER8"
+    scheme: http
+    static_configs:
+
+    - targets: ['192.168.1.155:8123']
+      labels:
+        location: 'kremenchuk'
+        role: 'hassio'
+        media: virtual
+
+# #####################
+  - job_name: app
+    scrape_interval: 60s
+    metrics_path: /metrics
+    static_configs:
+    - targets: [192.168.1.7:8083]
+      labels:
+       location: kremenchuk
+       media: virtual
+       role: service
+       id: pinger 
+# 6 -------------------------------------
+#  - job_name: 'esphome'
+#    scrape_interval: 5s
+#    metrics_path: /metrics
+#    static_configs:
+#    - targets: ['192.168.2.153']
+#      labels:
+#        location: kyiv
+#        media: hard
+#        role: switch
+#        id: therm-001
+#    - targets: ['192.168.2.100']
+#      labels:
+#        location: kyiv
+#        media: hard
+#        role: ble-tracker
+#        id: tracker-001
+
+
+#  - job_name: 'vpn-attack'
+#    scrape_interval: 5s
+#    metrics_path: /metrics
+#    scheme: http
+#    static_configs:
+
+#    - targets: ['192.168.1.105:9100']
+#      labels:
+#        location: 'kremenchuk'
+#        role: 'attack'
+#        media: virtual
+
+#    bearer_token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJhMDJjMTg4NGRkYmM0MGVhYTU4OTU2MDlmMWQ0Y2FkNyIsImlhdCI6MTYyMzY5NTI1MSwiZXhwIjoxOTM5MDU1MjUxfQ.G9o8SfmqLXCSNnbVGSz04fumlAuQGk1kcO9SXoa7y7o"
